@@ -7,8 +7,8 @@ import (
 	. "net/http"
 	"time"
 
-	"github.com/elazarl/goproxy"
-	goproxy_html "github.com/elazarl/goproxy/ext/html"
+	"github.com/goergch/goproxy"
+	goproxy_html "github.com/goergch/goproxy/ext/html"
 )
 
 type Count struct {
