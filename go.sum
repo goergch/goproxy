@@ -1,3 +1,5 @@
+github.com/goergch/goproxy/ext v0.0.0-20241212071011-630b3c2a31bd h1:SOzPY++E/Ri7EKDJtWWAjX/8FhQ8RqT31OVRzSR5R88=
+github.com/goergch/goproxy/ext v0.0.0-20241212071011-630b3c2a31bd/go.mod h1:Pbj7dDFCIY7kSJOqIeHZX6KVqux4cuAmvGnFNjvVKtM=
 github.com/rogpeppe/go-charset v0.0.0-20180617210344-2471d30d28b4/go.mod h1:qgYeAmZ5ZIpBWTGllZSQnw97Dj+woV0toclVaRGI8pc=
 golang.org/x/net v0.26.0 h1:soB7SVo0PWrY4vPW/+ay0jKDNScG2X9wFeYlXIvJsOQ=
 golang.org/x/net v0.26.0/go.mod h1:5YKkiSynbBIh3p6iOc/vibscux0x38BZDkn8sCUPxHE=
