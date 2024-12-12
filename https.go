@@ -42,9 +42,10 @@ var (
 // HTTP 200, or any other valid http response back to the client from within the
 // Hijack func
 type ConnectAction struct {
-	Action    ConnectActionLiteral
-	Hijack    func(req *http.Request, client net.Conn, ctx *ProxyCtx)
-	TLSConfig func(host string, ctx *ProxyCtx) (*tls.Config, error)
+	Action            ConnectActionLiteral
+	Hijack            func(req *http.Request, client net.Conn, ctx *ProxyCtx)
+	TLSConfig         func(host string, ctx *ProxyCtx) (*tls.Config, error)
+	UpstreamTLSConfig func(host string, ctx *ProxyCtx) (*tls.Config, error)
 }
 
 func stripPort(s string) string {
@@ -202,6 +203,8 @@ func (proxy *ProxyHttpServer) handleHttps(w http.ResponseWriter, r *http.Request
 		// request can take forever, and the server will be stuck when "closed".
 		// TODO: Allow Server.Close() mechanism to shut down this connection as nicely as possible
 		tlsConfig := defaultTLSConfig
+		upstreamTlsConfig := defaultTLSConfig
+
 		if todo.TLSConfig != nil {
 			var err error
 			tlsConfig, err = todo.TLSConfig(host, ctx)
@@ -209,6 +212,8 @@ func (proxy *ProxyHttpServer) handleHttps(w http.ResponseWriter, r *http.Request
 				httpError(proxyClient, ctx, err)
 				return
 			}
+			upstreamTlsConfig = tlsConfig.Clone()
+			upstreamTlsConfig, err = todo.TLSConfig(host, ctx)
 		}
 		go func() {
 			//TODO: cache connections to the remote website
@@ -258,7 +263,7 @@ func (proxy *ProxyHttpServer) handleHttps(w http.ResponseWriter, r *http.Request
 							ctx.Warnf("HTTP2 connection failed: disallowed")
 							return
 						}
-						tr := H2Transport{clientTlsReader, rawClientTls, tlsConfig.Clone(), host}
+						tr := H2Transport{clientTlsReader, rawClientTls, upstreamTlsConfig.Clone(), host}
 						if _, err := tr.RoundTrip(req); err != nil {
 							ctx.Warnf("HTTP2 connection failed: %v", err)
 						} else {
@@ -272,7 +277,7 @@ func (proxy *ProxyHttpServer) handleHttps(w http.ResponseWriter, r *http.Request
 							ctx.Logf("Enforced HTTP websocket forwarding over TLS")
 							proxy.serveWebsocketHttpOverTLS(ctx, w, req, rawClientTls)
 						} else {
-							proxy.serveWebsocketTLS(ctx, w, req, tlsConfig, rawClientTls)
+							proxy.serveWebsocketTLS(ctx, w, req, upstreamTlsConfig, rawClientTls)
 						}
 						return
 					}
