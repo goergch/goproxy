@@ -213,7 +213,16 @@ func (proxy *ProxyHttpServer) handleHttps(w http.ResponseWriter, r *http.Request
 				return
 			}
 			upstreamTlsConfig = tlsConfig.Clone()
-			upstreamTlsConfig, err = todo.TLSConfig(host, ctx)
+			upstreamTlsConfig, err = todo.UpstreamTLSConfig(host, ctx)
+		}
+		if todo.UpstreamTLSConfig != nil {
+			var err error
+			upstreamTlsConfig, err = todo.UpstreamTLSConfig(host, ctx)
+			if err != nil {
+				httpError(proxyClient, ctx, err)
+				return
+			}
+
 		}
 		go func() {
 			//TODO: cache connections to the remote website
